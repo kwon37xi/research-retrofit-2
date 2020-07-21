@@ -1,0 +1,23 @@
+
+plugins {
+    id 'java-library'
+    id 'application'
+}
+
+ext {
+    retrofit2Version = "2.9.0"
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    implementation "com.squareup.retrofit2:retrofit:${retrofit2Version}"
+    implementation "com.squareup.retrofit2:converter-jackson:${retrofit2Version}"
+}
+
+application {
+    mainClassName = 'kr.pe.kwonnam.research.java.App'
+}
