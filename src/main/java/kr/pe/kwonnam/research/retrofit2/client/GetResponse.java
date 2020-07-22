@@ -11,7 +11,7 @@ import java.util.Map;
 @Setter
 @ToString
 public class GetResponse {
-    private ArgsAsString args;
+    private Args args;
     private Map<String, String> headers;
     @JsonProperty("origin")
     private String originIp;
