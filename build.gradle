@@ -14,7 +14,9 @@ targetCompatibility = '11'
 
 ext {
     retrofit2Version = "2.9.0"
+    jacksonVersion = "2.10.1"
     lombokVersion = "1.18.12"
+    okhttpVersion = "3.14.9"
     junitVersion = "5.6.2"
 }
 
@@ -26,6 +28,7 @@ repositories {
 dependencies {
     implementation 'org.slf4j:jcl-over-slf4j:1.7.30'
     implementation 'org.slf4j:log4j-over-slf4j:1.7.30'
+    implementation 'org.slf4j:jul-to-slf4j:1.7.30'
     implementation 'ch.qos.logback:logback-classic:1.2.3'
 
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
@@ -36,11 +39,19 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:${retrofit2Version}"
     implementation "com.squareup.retrofit2:converter-jackson:${retrofit2Version}"
 
+    compile "com.squareup.okhttp3:logging-interceptor:${okhttpVersion}"
+
+    implementation "com.fasterxml.jackson.module:jackson-module-parameter-names:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
     testImplementation "org.assertj:assertj-core:3.16.1"
 
 }
+
+
 configurations {
     all*.exclude group: 'commons-logging', module: 'commons-logging' // replaced with jcl-over-slf4j
     all*.exclude group: 'log4j', module: 'log4j' // replaced with log4j-over-slf4j
