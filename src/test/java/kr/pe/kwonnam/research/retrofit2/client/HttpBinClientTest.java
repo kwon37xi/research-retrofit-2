@@ -144,4 +144,6 @@ class HttpBinClientTest {
     }
 
     // TODO enum.getCode() test
+
+    // TODO timeout test /delay/{delay seconds}
 }
