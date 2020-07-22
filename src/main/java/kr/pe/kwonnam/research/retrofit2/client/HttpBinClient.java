@@ -2,9 +2,7 @@ package kr.pe.kwonnam.research.retrofit2.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Query;
+import retrofit2.http.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -55,4 +53,7 @@ public interface HttpBinClient {
      */
     @GET("/get")
     Call<GetResponse> getProductTypeEnumJson(@Query("productType") String productType);
+
+    @POST("/post")
+    Call<PostResponse> postJson(@Body Args postArgs);
 }

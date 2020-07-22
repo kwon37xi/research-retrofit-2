@@ -14,7 +14,11 @@ implementation "com.squareup.retrofit2:converter-jackson:2.9.0"
 기본적으로 `@Query("paramName") String paramName` 에서 해당 파라미터는 URL 파라미터로 전환시 `toString()` 메소드 호출 결과로 직렬화된다.
 이를 강제로 변경하려면 `retrofit2.Converter.Factory` 를 상속하여, `stringConverter()` 메소드를 override 해줘야한다.
 
-* `kr.pe.kwonnam.research.retrofit2.converterfactories.LocalDateTimeQueryParamConverterFactory` 참조
+* `LocalDateTimeQueryParamConverterFactory`
+* `EnumCodePropertyQueryParamConverterFactory`
+
+## Jackson ObjectMapper 및 OkHhtpClient 설정
+* `RetrofitHttpBinClientBuilder` 참조
 
 ## 참조 문서
 * [Retrofit 2과 함께하는 정말 쉬운 HTTP](https://academy.realm.io/kr/posts/droidcon-jake-wharton-simple-http-retrofit-2/)
