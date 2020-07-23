@@ -56,4 +56,7 @@ public interface HttpBinClient {
 
     @POST("/post")
     Call<PostResponse> postJson(@Body Args postArgs);
+
+    @GET("/get")
+    Call<JsonNode> getProductTypeWithCode(@Query("productTypeWithCode") ProductTypeWithCode productTypeWithCode);
 }

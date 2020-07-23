@@ -15,12 +15,20 @@ implementation "com.squareup.retrofit2:converter-jackson:2.9.0"
 이를 강제로 변경하려면 `retrofit2.Converter.Factory` 를 상속하여, `stringConverter()` 메소드를 override 해줘야한다.
 
 * `LocalDateTimeQueryParamConverterFactory`
-* `EnumCodePropertyQueryParamConverterFactory`
+* `EnumCodePropertyParamConverterFactory`
 
 ## Jackson ObjectMapper 및 OkHhtpClient 설정
 * `RetrofitHttpBinClientBuilder` 참조
 
+## TODO
+- enum converter
+- [동기 응답](https://stackoverflow.com/a/35104080/1051402)
+- form 전송
+- 파일 전송
+- basic auth
+
 ## 참조 문서
+* [Retrofit Tutorial](https://futurestud.io/tutorials/tag/retrofit)
 * [Retrofit 2과 함께하는 정말 쉬운 HTTP](https://academy.realm.io/kr/posts/droidcon-jake-wharton-simple-http-retrofit-2/)
 * [Java - Retrofit이란? (retrofit 사용법 자세한 설명)](https://galid1.tistory.com/617)
 * [Using Retrofit 2.x as REST client - Tutorial](https://www.vogella.com/tutorials/Retrofit/article.html)
@@ -28,3 +36,6 @@ implementation "com.squareup.retrofit2:converter-jackson:2.9.0"
   * 이 글의 설명은 잘못되었다(혹은 버전 문제거나).
   Retrofit 2 는 enum 의 `name()` 으로 올바르게 enum 값을 직렬화한다.
   enum 을 `name()`이 아닌 다른 것으로 직렬화하고자 할 때 사용할 것.
+* [HwangEunmi/Retrofit-Sample](https://github.com/HwangEunmi/Retrofit-Sample)
+* [동기 응답](https://stackoverflow.com/a/35104080/1051402) : `Call`이나 `CompletableFuture` 등으로 감싸지
+ 않고 원하는 객체를 바로 반환하게 하는 방법

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import kr.pe.kwonnam.research.retrofit2.RetrofitHttpBinClientBuilder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,13 +20,6 @@ class HttpBinClientTest {
 
     private HttpBinClient httpBinClient;
 
-    @BeforeAll
-    static void beforeAll() {
-        // okhttp 가 java.util.logging 을 사용하기 때문에 처리해줌.
-//        SLF4JBridgeHandler.removeHandlersForRootLogger();  // (since SLF4J 1.6.5)
-//        SLF4JBridgeHandler.install();
-    }
-
     @BeforeEach
     void beforeEach() {
         httpBinClient = new RetrofitHttpBinClientBuilder()
@@ -36,7 +28,7 @@ class HttpBinClientTest {
 
     @Test
     void simpleGet() throws IOException {
-        var expectedCustomHeader = "restrofit simpleGet test";
+        var expectedCustomHeader = "retrofit simpleGet test";
         JsonNode bodyJsonNode = httpBinClient.getSimpleGet(expectedCustomHeader).execute()
             .body();
 
@@ -72,7 +64,6 @@ class HttpBinClientTest {
         assertThat(args.getOrderDateTime()).isEqualTo(LocalDateTime.of(2020, 7, 22, 14, 12, 31, 789));
         assertThat(args.getExpireYear()).isEqualTo(Year.of(2030));
     }
-
 
     @Test
     @DisplayName("Args 클래스에 존재하지 않는 프라퍼티 응답을 받아도 역직렬화시에 오류가 발생하지 않게 Jackson 설정이 돼 있어야한다.")
@@ -127,7 +118,7 @@ class HttpBinClientTest {
             .produceDate(LocalDate.of(2019, 3, 6))
             .produceTime(LocalTime.of(3, 33, 0, 123))
             .orderDateTime(LocalDateTime.of(2018, 7, 12, 13, 21, 30, 123456789))
-            .expireYear(Year.of(2200))
+            .expireYear(Year.of(987))
             .build();
 
         PostResponse postResponse = httpBinClient.postJson(postArgs).execute().body();
@@ -140,10 +131,19 @@ class HttpBinClientTest {
         assertThat(json).containsEntry("produceDate", "2019-03-06");
         assertThat(json).containsEntry("produceTime", "03:33:00.000000123");
         assertThat(json).containsEntry("orderDateTime", "2018-07-12T13:21:30.123456789");
-        assertThat(json).containsEntry("expireYear", "2200");
+        assertThat(json).containsEntry("expireYear", "987");
     }
 
-    // TODO enum.getCode() test
+    @Test
+    @DisplayName("EnumCodePropertyParamConverterFactory 가 작동하여 code 값으로 enum을 직렬화한다.")
+    void getProductTypeWithCode() throws IOException {
+        var productTypeWithCodeCall = httpBinClient.getProductTypeWithCode(ProductTypeWithCode.MOBILE_PHONE);
 
-    // TODO timeout test /delay/{delay seconds}
+        var jsonNode = productTypeWithCodeCall.execute().body();
+        var productTypeCode = jsonNode.get("args").get("productTypeWithCode").asText();
+
+        assertThat(productTypeCode).isEqualTo(ProductTypeWithCode.MOBILE_PHONE.getCode());
+    }
+
+// TODO timeout test /delay/{delay seconds}
 }

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import kr.pe.kwonnam.research.retrofit2.converterfactories.LocalDateTimeQueryParamConverterFactory;
+import kr.pe.kwonnam.research.retrofit2.converterfactories.*;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -32,7 +32,7 @@ public class RetrofitHttpBinClientBuilder {
             .registerModule(new JavaTimeModule())
             .setLocale(Locale.getDefault())
             .setTimeZone(TimeZone.getDefault())
-            // 모르은 property 를 역직렬화 할 때 오류없이 무시하게 한다.
+            // 모르는 property 를 역직렬화 할 때 오류없이 무시하게 한다.
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             // 모르는 ENUM 값을 역직렬화 할 때 null로 취급하게 한다.
             .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
@@ -51,7 +51,11 @@ public class RetrofitHttpBinClientBuilder {
         return new Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(JacksonConverterFactory.create(objectMapper))
-            .addConverterFactory(new LocalDateTimeQueryParamConverterFactory())
+            .addConverterFactory(new LocalDateTimeParamConverterFactory())
+            .addConverterFactory(new LocalDateParamConverterFactory())
+            .addConverterFactory(new LocalTimeParamConverterFactory())
+            .addConverterFactory(new YearParamConverterFactory())
+            .addConverterFactory(new EnumCodePropertyParamConverterFactory())
             .client(okHttpClient)
             .build();
     }
