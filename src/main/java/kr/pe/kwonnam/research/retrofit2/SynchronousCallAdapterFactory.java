@@ -3,6 +3,7 @@ package kr.pe.kwonnam.research.retrofit2;
 import lombok.extern.slf4j.Slf4j;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import java.lang.annotation.Annotation;
@@ -36,7 +37,7 @@ public class SynchronousCallAdapterFactory extends CallAdapter.Factory {
             }
         }
 
-        return new CallAdapter<Object, Object>() {
+        return new CallAdapter<>() {
             @Override
             public Type responseType() {
                 return returnType;
@@ -45,7 +46,8 @@ public class SynchronousCallAdapterFactory extends CallAdapter.Factory {
             @Override
             public Object adapt(Call<Object> call) {
                 try {
-                    return call.execute().body();
+                    Response<Object> response = call.execute();
+                    return response.body();
                 } catch (Exception ex) {
                     throw new IllegalStateException("retrofit synchronous call failed. - " + ex.getMessage(), ex);
                 }

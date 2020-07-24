@@ -78,5 +78,4 @@ public interface HttpBinClient {
                                        @Query("produceTime") LocalTime produceTime,
                                        @Query("orderDateTime") LocalDateTime orderDateTime,
                                        @Query("expireYear") Year expireYear);
-
 }
