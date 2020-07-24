@@ -17,15 +17,51 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 @Slf4j
 public class RetrofitHttpBinClientBuilder {
-
     private final Logger okhttpLogger = LoggerFactory.getLogger("okhttp");
 
-    private Retrofit createRetrofitInstance(String baseUrl, Duration connectionTimeout, Duration readTimeout, Duration writeTimeout) {
+    public static final Duration DEFAULT_CONNECTION_TIMEOUT_DURATION = Duration.ofMillis(1000L);
+    public static final Duration DEFAULT_READ_WRITE_TIMEOUT_DURATION = Duration.ofMillis(5000L);
+
+    private String baseUrl;
+    private Duration connectionTimeout = DEFAULT_CONNECTION_TIMEOUT_DURATION;
+    private Duration readTimeout = DEFAULT_READ_WRITE_TIMEOUT_DURATION;
+    private Duration writeTimeout = DEFAULT_READ_WRITE_TIMEOUT_DURATION;
+
+    private List<OkHttpClientBuilderCustomizer> okHttpClientBuilderCustomizers = Collections.emptyList();
+
+    public RetrofitHttpBinClientBuilder baseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+        return this;
+    }
+
+    public RetrofitHttpBinClientBuilder connectionTimeout(Duration connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
+        return this;
+    }
+
+    public RetrofitHttpBinClientBuilder readTimeout(Duration readTimeout) {
+        this.readTimeout = readTimeout;
+        return this;
+    }
+
+    public RetrofitHttpBinClientBuilder writeTimeout(Duration writeTimeout) {
+        this.writeTimeout = writeTimeout;
+        return this;
+    }
+
+    public RetrofitHttpBinClientBuilder okHttpClientBuilderCustomizer(List<OkHttpClientBuilderCustomizer> okHttpClientBuilderCustomizers) {
+        this.okHttpClientBuilderCustomizers = okHttpClientBuilderCustomizers;
+        return this;
+    }
+
+    public <T> T build(Class<T> clientClass) {
         ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new ParameterNamesModule())
             .registerModule(new Jdk8Module())
@@ -40,15 +76,22 @@ public class RetrofitHttpBinClientBuilder {
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
             .configure(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS, true);
 
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+        OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
             .connectTimeout(connectionTimeout)
             .readTimeout(readTimeout)
             .writeTimeout(writeTimeout)
             .addInterceptor(new HttpLoggingInterceptor(message -> okhttpLogger.info("OKHTTP : {}", message))
-                .setLevel(HttpLoggingInterceptor.Level.BODY))
-            .build();
+                .setLevel(HttpLoggingInterceptor.Level.BODY));
 
-        return new Retrofit.Builder()
+        if (okHttpClientBuilderCustomizers != null) {
+            for (OkHttpClientBuilderCustomizer okHttpClientBuilderCustomizer : okHttpClientBuilderCustomizers) {
+                okHttpClientBuilderCustomizer.customize(okHttpClientBuilder);
+            }
+        }
+
+        OkHttpClient okHttpClient = okHttpClientBuilder.build();
+
+        Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(JacksonConverterFactory.create(objectMapper))
             .addConverterFactory(new LocalDateTimeParamConverterFactory())
@@ -58,9 +101,7 @@ public class RetrofitHttpBinClientBuilder {
             .addConverterFactory(new EnumCodePropertyParamConverterFactory())
             .client(okHttpClient)
             .build();
-    }
-
-    public <T> T createHttpBinClient(Class<T> clientClass, String baseUrl, Duration connectionTimeout, Duration readTimeout, Duration writeTimeout) {
-        return createRetrofitInstance(baseUrl, connectionTimeout, readTimeout, writeTimeout).create(clientClass);
+        
+        return retrofit.create(clientClass);
     }
 }

@@ -59,4 +59,7 @@ public interface HttpBinClient {
 
     @GET("/get")
     Call<JsonNode> getProductTypeWithCode(@Query("productTypeWithCode") ProductTypeWithCode productTypeWithCode);
+
+    @GET("/delay/{delaySeconds}")
+    Call<JsonNode> delay(@Path("delaySeconds") int delaySeconds);
 }

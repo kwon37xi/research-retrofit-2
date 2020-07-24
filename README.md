@@ -21,11 +21,13 @@ implementation "com.squareup.retrofit2:converter-jackson:2.9.0"
 * `RetrofitHttpBinClientBuilder` 참조
 
 ## TODO
-- enum converter
 - [동기 응답](https://stackoverflow.com/a/35104080/1051402)
+  - Retry
+  - Exception translation
 - form 전송
 - 파일 전송
-- basic auth
+- [basic auth](https://stackoverflow.com/questions/43366164/retrofit-and-okhttp-basic-authentication)
+  - https://futurestud.io/tutorials/android-basic-authentication-with-retrofit
 
 ## 참조 문서
 * [Retrofit Tutorial](https://futurestud.io/tutorials/tag/retrofit)

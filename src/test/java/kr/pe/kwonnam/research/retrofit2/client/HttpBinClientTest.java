@@ -10,9 +10,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.SocketTimeoutException;
 import java.time.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Slf4j
 @DisplayName("HttpBinClientTest")
@@ -23,7 +25,11 @@ class HttpBinClientTest {
     @BeforeEach
     void beforeEach() {
         httpBinClient = new RetrofitHttpBinClientBuilder()
-            .createHttpBinClient(HttpBinClient.class, HttpBinClient.HTTPBIN_BASE_URL, Duration.ofMillis(1000), Duration.ofMillis(5000), Duration.ofMillis(5000));
+            .baseUrl(HttpBinClient.HTTPBIN_BASE_URL)
+            .connectionTimeout(Duration.ofMillis(500))
+            .readTimeout(Duration.ofMillis(5000))
+            .writeTimeout(Duration.ofMillis(5000))
+            .build(HttpBinClient.class);
     }
 
     @Test
@@ -145,5 +151,20 @@ class HttpBinClientTest {
         assertThat(productTypeCode).isEqualTo(ProductTypeWithCode.MOBILE_PHONE.getCode());
     }
 
-// TODO timeout test /delay/{delay seconds}
+    @Test
+    @DisplayName("지정된 readTimeout(5s) 보다 더 오래 delay 할 경우 readTimeout 시점에 오류를 발생시킨다.")
+    void delayOver() throws IOException {
+        int delaySeconds = 6;
+        assertThatThrownBy(() -> httpBinClient.delay(delaySeconds).execute())
+            .hasMessage("timeout");
+    }
+
+    @Test
+    @DisplayName("지정된 readTimeout(5s) 보다 짧게 delay 할 경우 오류가 발생하지 않는다.")
+    void delayNotOver() throws IOException {
+        int delaySeconds = 4;
+        JsonNode body = httpBinClient.delay(delaySeconds).execute().body();
+
+        assertThat(body.get("url").asText()).isEqualTo("https://httpbin.org/delay/4");
+    }
 }
