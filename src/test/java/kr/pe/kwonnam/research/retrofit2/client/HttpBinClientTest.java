@@ -4,13 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import kr.pe.kwonnam.research.retrofit2.RetrofitHttpBinClientBuilder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.SocketTimeoutException;
 import java.time.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Slf4j
 @DisplayName("HttpBinClientTest")
+@ExtendWith({SoftAssertionsExtension.class})
 class HttpBinClientTest {
 
     private HttpBinClient httpBinClient;
@@ -172,7 +175,7 @@ class HttpBinClientTest {
     @Test
     @DisplayName("동기식 호출 - 응답 타입을 Call로 감싸지 않고 직접 기술할 수 있다.")
     @SneakyThrows
-    void syncGetWithQueryParams() {
+    void syncGetWithQueryParams(SoftAssertions softly) {
         GetResponse getResponse = httpBinClient.syncGetWithQueryParams("Retrofit 시즌2 동기식 호출",
             ProductType.LAPTOP,
             1001,
@@ -183,14 +186,17 @@ class HttpBinClientTest {
             Year.of(2041));
 
         var args = getResponse.getArgs();
-        assertThat(args.getProductName()).isEqualTo("Retrofit 시즌2 동기식 호출");
-        assertThat(args.getProductType()).isEqualTo(ProductType.LAPTOP);
-        assertThat(args.getQuantity()).isEqualTo(1001);
-        assertThat(args.getPrice()).isEqualTo(new BigDecimal("2300000"));
-        assertThat(args.getProduceDate()).isEqualTo(LocalDate.of(2020, 7, 24));
-        assertThat(args.getProduceTime()).isEqualTo(LocalTime.of(17, 8));
-        assertThat(args.getOrderDateTime()).isEqualTo("2020-07-24T20:31:48.000000111");
-        assertThat(args.getOrderDateTime()).isEqualTo(LocalDateTime.of(2020, 7, 24, 20, 31, 48, 111));
-        assertThat(args.getExpireYear()).isEqualTo(Year.of(2041));
+        softly.assertThat(args.getProductName()).as("productName이 쿼리 파라미터와 일치해야한다.")
+            .isEqualTo("Retrofit 시즌2 동기식 호출");
+        softly.assertThat(args.getProductType()).as("productType enum이 쿼리 파라미터와 일치해야한다.")
+            .isEqualTo(ProductType.LAPTOP);
+        softly.assertThat(args.getQuantity()).as("quantity가 쿼리 파라미터와 일치해야한다.")
+            .isEqualTo(1001);
+        softly.assertThat(args.getPrice()).isEqualTo(new BigDecimal("2300000"));
+        softly.assertThat(args.getProduceDate()).isEqualTo(LocalDate.of(2020, 7, 24));
+        softly.assertThat(args.getProduceTime()).isEqualTo(LocalTime.of(17, 8));
+        softly.assertThat(args.getOrderDateTime()).isEqualTo("2020-07-24T20:31:48.000000111");
+        softly.assertThat(args.getOrderDateTime()).isEqualTo(LocalDateTime.of(2020, 7, 24, 20, 31, 48, 111));
+        softly.assertThat(args.getExpireYear()).isEqualTo(Year.of(2041));
     }
 }
