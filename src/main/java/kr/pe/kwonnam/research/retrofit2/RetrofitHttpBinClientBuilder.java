@@ -80,7 +80,7 @@ public class RetrofitHttpBinClientBuilder {
             .connectTimeout(connectionTimeout)
             .readTimeout(readTimeout)
             .writeTimeout(writeTimeout)
-            .addInterceptor(new HttpLoggingInterceptor(message -> okhttpLogger.info("OKHTTP : {}", message))
+            .addInterceptor(new HttpLoggingInterceptor(message -> okhttpLogger.debug("OKHTTP : {}", message))
                 .setLevel(HttpLoggingInterceptor.Level.BODY));
 
         if (okHttpClientBuilderCustomizers != null) {
@@ -93,6 +93,7 @@ public class RetrofitHttpBinClientBuilder {
 
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(baseUrl)
+            .addCallAdapterFactory(SynchronousCallAdapterFactory.create())
             .addConverterFactory(JacksonConverterFactory.create(objectMapper))
             .addConverterFactory(new LocalDateTimeParamConverterFactory())
             .addConverterFactory(new LocalDateParamConverterFactory())
@@ -101,7 +102,7 @@ public class RetrofitHttpBinClientBuilder {
             .addConverterFactory(new EnumCodePropertyParamConverterFactory())
             .client(okHttpClient)
             .build();
-        
+
         return retrofit.create(clientClass);
     }
 }

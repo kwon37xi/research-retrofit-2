@@ -167,4 +167,30 @@ class HttpBinClientTest {
 
         assertThat(body.get("url").asText()).isEqualTo("https://httpbin.org/delay/4");
     }
+
+
+    @Test
+    @DisplayName("동기식 호출 - 응답 타입을 Call로 감싸지 않고 직접 기술할 수 있다.")
+    @SneakyThrows
+    void syncGetWithQueryParams() {
+        GetResponse getResponse = httpBinClient.syncGetWithQueryParams("Retrofit 시즌2 동기식 호출",
+            ProductType.LAPTOP,
+            1001,
+            new BigDecimal("2300000"),
+            LocalDate.of(2020, 7, 24),
+            LocalTime.of(17, 8),
+            LocalDateTime.of(2020, 7, 24, 20, 31, 48, 111),
+            Year.of(2041));
+
+        var args = getResponse.getArgs();
+        assertThat(args.getProductName()).isEqualTo("Retrofit 시즌2 동기식 호출");
+        assertThat(args.getProductType()).isEqualTo(ProductType.LAPTOP);
+        assertThat(args.getQuantity()).isEqualTo(1001);
+        assertThat(args.getPrice()).isEqualTo(new BigDecimal("2300000"));
+        assertThat(args.getProduceDate()).isEqualTo(LocalDate.of(2020, 7, 24));
+        assertThat(args.getProduceTime()).isEqualTo(LocalTime.of(17, 8));
+        assertThat(args.getOrderDateTime()).isEqualTo("2020-07-24T20:31:48.000000111");
+        assertThat(args.getOrderDateTime()).isEqualTo(LocalDateTime.of(2020, 7, 24, 20, 31, 48, 111));
+        assertThat(args.getExpireYear()).isEqualTo(Year.of(2041));
+    }
 }
