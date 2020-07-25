@@ -18,7 +18,7 @@ implementation "com.squareup.retrofit2:converter-jackson:2.9.0"
 * [EnumCodePropertyParamConverterFactory](https://github.com/kwon37xi/research-retrofit-2/blob/main/src/main/java/kr/pe/kwonnam/research/retrofit2/converterfactories/EnumCodePropertyParamConverterFactory.java)
 
 ## Jackson ObjectMapper 및 OkHhtpClient 설정
-* [RetrofitBinClientBuilder](https://github.com/kwon37xi/research-retrofit-2/blob/main/src/main/java/kr/pe/kwonnam/research/retrofit2/RetrofitClientBuilder.java) 참조
+* [RetrofitClientBuilder](https://github.com/kwon37xi/research-retrofit-2/blob/main/src/main/java/kr/pe/kwonnam/research/retrofit2/RetrofitClientBuilder.java) 참조
 
 ## 동기식 작동 및, 응답 클래스를 직접 지정하기
 * [SynchronousCallAdapterFactory](https://github.com/kwon37xi/research-retrofit-2/blob/main/src/main/java/kr/pe/kwonnam/research/retrofit2/SynchronousCallAdapterFactory.java) 참조
