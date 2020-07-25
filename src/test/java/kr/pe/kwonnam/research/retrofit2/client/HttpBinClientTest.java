@@ -1,7 +1,7 @@
 package kr.pe.kwonnam.research.retrofit2.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.pe.kwonnam.research.retrofit2.RetrofitHttpBinClientBuilder;
+import kr.pe.kwonnam.research.retrofit2.RetrofitClientBuilder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.SoftAssertions;
@@ -27,7 +27,7 @@ class HttpBinClientTest {
 
     @BeforeEach
     void beforeEach() {
-        httpBinClient = new RetrofitHttpBinClientBuilder()
+        httpBinClient = new RetrofitClientBuilder()
             .baseUrl(HttpBinClient.HTTPBIN_BASE_URL)
             .connectionTimeout(Duration.ofMillis(500))
             .readTimeout(Duration.ofMillis(5000))

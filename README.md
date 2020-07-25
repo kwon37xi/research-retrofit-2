@@ -14,11 +14,14 @@ implementation "com.squareup.retrofit2:converter-jackson:2.9.0"
 기본적으로 `@Query("paramName") String paramName` 에서 해당 파라미터는 URL 파라미터로 전환시 `toString()` 메소드 호출 결과로 직렬화된다.
 이를 강제로 변경하려면 `retrofit2.Converter.Factory` 를 상속하여, `stringConverter()` 메소드를 override 해줘야한다.
 
-* `LocalDateTimeQueryParamConverterFactory`
-* `EnumCodePropertyParamConverterFactory`
+* [LocalDateTimeParamConverterFactory](https://github.com/kwon37xi/research-retrofit-2/blob/main/src/main/java/kr/pe/kwonnam/research/retrofit2/converterfactories/LocalDateTimeParamConverterFactory.java)
+* [EnumCodePropertyParamConverterFactory](https://github.com/kwon37xi/research-retrofit-2/blob/main/src/main/java/kr/pe/kwonnam/research/retrofit2/converterfactories/EnumCodePropertyParamConverterFactory.java)
 
 ## Jackson ObjectMapper 및 OkHhtpClient 설정
-* `RetrofitHttpBinClientBuilder` 참조
+* [RetrofitBinClientBuilder](https://github.com/kwon37xi/research-retrofit-2/blob/main/src/main/java/kr/pe/kwonnam/research/retrofit2/RetrofitClientBuilder.java) 참조
+
+## 동기식 작동 및, 응답 클래스를 직접 지정하기
+* [SynchronousCallAdapterFactory](https://github.com/kwon37xi/research-retrofit-2/blob/main/src/main/java/kr/pe/kwonnam/research/retrofit2/SynchronousCallAdapterFactory.java) 참조
 
 ## TODO
     - Retry

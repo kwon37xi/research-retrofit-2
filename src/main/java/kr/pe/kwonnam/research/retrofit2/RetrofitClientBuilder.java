@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 @Slf4j
-public class RetrofitHttpBinClientBuilder {
+public class RetrofitClientBuilder {
     private final Logger okhttpLogger = LoggerFactory.getLogger("okhttp");
 
     public static final Duration DEFAULT_CONNECTION_TIMEOUT_DURATION = Duration.ofMillis(1000L);
@@ -36,27 +36,27 @@ public class RetrofitHttpBinClientBuilder {
 
     private List<OkHttpClientBuilderCustomizer> okHttpClientBuilderCustomizers = Collections.emptyList();
 
-    public RetrofitHttpBinClientBuilder baseUrl(String baseUrl) {
+    public RetrofitClientBuilder baseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
         return this;
     }
 
-    public RetrofitHttpBinClientBuilder connectionTimeout(Duration connectionTimeout) {
+    public RetrofitClientBuilder connectionTimeout(Duration connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
         return this;
     }
 
-    public RetrofitHttpBinClientBuilder readTimeout(Duration readTimeout) {
+    public RetrofitClientBuilder readTimeout(Duration readTimeout) {
         this.readTimeout = readTimeout;
         return this;
     }
 
-    public RetrofitHttpBinClientBuilder writeTimeout(Duration writeTimeout) {
+    public RetrofitClientBuilder writeTimeout(Duration writeTimeout) {
         this.writeTimeout = writeTimeout;
         return this;
     }
 
-    public RetrofitHttpBinClientBuilder okHttpClientBuilderCustomizer(List<OkHttpClientBuilderCustomizer> okHttpClientBuilderCustomizers) {
+    public RetrofitClientBuilder okHttpClientBuilderCustomizer(List<OkHttpClientBuilderCustomizer> okHttpClientBuilderCustomizers) {
         this.okHttpClientBuilderCustomizers = okHttpClientBuilderCustomizers;
         return this;
     }

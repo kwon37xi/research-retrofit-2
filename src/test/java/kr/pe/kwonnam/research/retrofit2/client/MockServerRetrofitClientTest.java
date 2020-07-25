@@ -1,7 +1,7 @@
 package kr.pe.kwonnam.research.retrofit2.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.pe.kwonnam.research.retrofit2.RetrofitHttpBinClientBuilder;
+import kr.pe.kwonnam.research.retrofit2.RetrofitClientBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +50,7 @@ class MockServerRetrofitClientTest {
 
     @BeforeEach
     void setUp() {
-        mockServerRetrofitClient = new RetrofitHttpBinClientBuilder()
+        mockServerRetrofitClient = new RetrofitClientBuilder()
             .baseUrl("http://localhost:" + port)
             .connectionTimeout(Duration.ofMillis(500))
             .readTimeout(Duration.ofMillis(1000))
