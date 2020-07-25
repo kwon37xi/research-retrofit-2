@@ -22,12 +22,12 @@ implementation "com.squareup.retrofit2:converter-jackson:2.9.0"
 
 ## 동기식 작동 및, 응답 클래스를 직접 지정하기
 * [SynchronousCallAdapterFactory](https://github.com/kwon37xi/research-retrofit-2/blob/main/src/main/java/kr/pe/kwonnam/research/retrofit2/SynchronousCallAdapterFactory.java) 참조
+* 응답 결과를 `Call<>`로 감싸지 않고 바로 지정할 수 있다.
+* 오류 응답(4xx, 5xx) 일 경우 해당 결과를 Exception으로 변환할 수 있어야한다.
+* 재시도를 해야 한다.
 
 ## TODO
     - Retry
-    - Exception translation
-- form 전송
-- 파일 전송
 - [basic auth](https://stackoverflow.com/questions/43366164/retrofit-and-okhttp-basic-authentication)
   - https://futurestud.io/tutorials/android-basic-authentication-with-retrofit
 

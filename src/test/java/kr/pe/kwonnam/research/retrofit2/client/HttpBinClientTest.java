@@ -174,7 +174,6 @@ class HttpBinClientTest {
 
     @Test
     @DisplayName("동기식 호출 - 응답 타입을 Call로 감싸지 않고 직접 기술할 수 있다.")
-    @SneakyThrows
     void syncGetWithQueryParams(SoftAssertions softly) {
         GetResponse getResponse = httpBinClient.syncGetWithQueryParams("Retrofit 시즌2 동기식 호출",
             ProductType.LAPTOP,

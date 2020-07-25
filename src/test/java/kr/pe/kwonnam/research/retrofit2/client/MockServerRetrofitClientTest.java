@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
+import static org.assertj.core.api.Assertions.linesOf;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -49,6 +50,25 @@ class MockServerRetrofitClientTest {
                         "    \"errorMessage\" : \"400 에러 메시지를 고의로 발생시켰습니다.\"\n" +
                         "}", StandardCharsets.UTF_8)
             );
+
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath("/error/500")
+        ).respond(
+            response()
+                .withStatusCode(500)
+                .withContentType(MediaType.TEXT_HTML_UTF_8)
+                .withBody("<html>\n" +
+                    "<head>\n" +
+                    "    " +
+                    "<title>error!</title>\n" +
+                    "</head>\n" +
+                    "<body>\n" +
+                    "에러가 발생하였습니다.\n" +
+                    "</body>\n" +
+                    "</html>")
+        );
     }
 
     @BeforeEach
@@ -62,14 +82,30 @@ class MockServerRetrofitClientTest {
     }
 
     @Test
-    @DisplayName("400 오류 코드 반환시 예외가 발생해야 한다.")
+    @DisplayName("400 오류 코드와 함께 오류 정보 JSON 반환시 예외가 발생하고 JSON 예외 내용이 들어있어야 한다.")
     void error400(SoftAssertions softly) {
-        ApiRequestException customEx = catchThrowableOfType(() -> {
+        ApiRequestException apiEx = catchThrowableOfType(() -> {
             mockServerRetrofitClient.error400("hello world");
         }, ApiRequestException.class);
 
 
-        softly.assertThat(customEx.getErrorCode()).as("errorCode 는 json의 errorCode 필드 값이어야한다.").isEqualTo("YOUBAD");
-        softly.assertThat(customEx.getMessage()).as("예외 메시지는 json의 errorMessage 필드 값이어야한다.").isEqualTo("400 에러 메시지를 고의로 발생시켰습니다.");
+        softly.assertThat(apiEx.getErrorCode()).as("errorCode 는 json의 errorCode 필드 값이어야한다.").isEqualTo("YOUBAD");
+        softly.assertThat(apiEx.getMessage()).as("예외 메시지는 json의 errorMessage 필드 값이어야한다.").isEqualTo("400 에러 메시지를 고의로 발생시켰습니다.");
+    }
+
+    @Test
+    @DisplayName("500 오류 코드와 함께 HTML 로 오류 정보 반환시, 예외가 발생하고, 예외 HTML이 내용으로 들어있어야 한다.")
+    void error500(SoftAssertions softly) {
+        var apiEx = catchThrowableOfType(() -> {
+            mockServerRetrofitClient.error500();
+        }, ApiRequestException.class);
+
+        softly.assertThat(apiEx.getErrorCode()).as("errorCode 는 UNKNOWN이다.")
+            .isEqualTo("UNKNOWN");
+
+        softly.assertThat(apiEx.getMessage()).as("HTML 로 전송된 내용을 저장하고 있어야한다.")
+            .startsWith("<html>")
+            .contains("에러가 발생하였습니다.")
+            .endsWith("</html>");
     }
 }
