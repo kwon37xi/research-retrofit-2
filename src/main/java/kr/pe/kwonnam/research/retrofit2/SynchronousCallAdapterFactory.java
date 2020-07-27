@@ -1,10 +1,6 @@
 package kr.pe.kwonnam.research.retrofit2;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.pe.kwonnam.research.retrofit2.client.ApiRequestException;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.MediaType;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Response;
@@ -26,12 +22,6 @@ public class SynchronousCallAdapterFactory extends CallAdapter.Factory {
 
     private static final List<Class<?>> EXCLUDE_CLASSES = List.of(Call.class, CompletableFuture.class);
 
-    private final ObjectMapper errorResponseObjectMapper;
-
-    public SynchronousCallAdapterFactory() {
-        errorResponseObjectMapper = new ObjectMapper();
-    }
-
 
     @Override
     public CallAdapter<?, ?> get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
@@ -49,18 +39,22 @@ public class SynchronousCallAdapterFactory extends CallAdapter.Factory {
             }
         }
 
-        return new SynchronousCallAdapter(returnType);
+        // TODO 메소드 Annotation 으로 응답 retry 설정할 수 있게 처리
+        return new SynchronousCallAdapter(returnType, new DefaultSynchronousCallFailedResponseHandler());
     }
 
     public static SynchronousCallAdapterFactory create() {
         return new SynchronousCallAdapterFactory();
     }
 
+    // todo failedResponseHandler 한번만 생성해서 주입하게 처리
     private class SynchronousCallAdapter implements CallAdapter<Object, Object> {
         private final Type returnType;
+        private final SynchronousCallFailedResponseHandler synchronousCallFailedResponseHandler;
 
-        public SynchronousCallAdapter(Type returnType) {
+        public SynchronousCallAdapter(Type returnType, SynchronousCallFailedResponseHandler synchronousCallFailedResponseHandler) {
             this.returnType = returnType;
+            this.synchronousCallFailedResponseHandler = synchronousCallFailedResponseHandler;
         }
 
         @Override
@@ -70,36 +64,74 @@ public class SynchronousCallAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public Object adapt(Call<Object> call) {
+
             try {
                 Response<Object> response = call.execute();
-
                 if (response.isSuccessful()) {
                     return response.body();
                 }
-                return handleErrorResponse(response);
-            } catch (ApiRequestException customEx) {
+                throw synchronousCallFailedResponseHandler.handleErrorResponse(response);
+            } catch (RuntimeException customEx) {
                 throw customEx;
             } catch (Exception ex) {
                 throw new IllegalStateException("retrofit synchronous call failed. - " + ex.getMessage(), ex);
             }
         }
 
-        private Object handleErrorResponse(Response<Object> response) throws IOException {
-            int responseStatusCode = response.code();
-            MediaType errorMediaType = response.errorBody().contentType();
-            String errorBodyString = response.errorBody().string();
+    }
 
-            log.debug("failure status code : {}, contentType: {} type : {} , subtype : {}, errorBody : {}",
-                responseStatusCode, errorMediaType, errorMediaType.type(), errorMediaType.subtype(), errorBodyString);
+    // todo 요청 하나하나마다 새로 생성되는 객체인지 확인.
+    private class SynchronousCallRetryAdapter implements CallAdapter<Object, Object> {
 
-            if (errorMediaType.subtype().equals("json")) {
-                JsonNode jsonNode = errorResponseObjectMapper.reader().readTree(errorBodyString);
-                String errorCode = jsonNode.get("errorCode").asText();
-                String errorMessage = jsonNode.get("errorMessage").asText();
+        private final Type returnType;
+        private final SynchronousCallFailedResponseHandler synchronousCallFailedResponseHandler;
+        private final int maxTryCount;
 
-                throw new ApiRequestException(responseStatusCode, errorCode, errorMessage);
+        private SynchronousCallRetryAdapter(Type returnType, SynchronousCallFailedResponseHandler synchronousCallFailedResponseHandler, int maxTryCount) {
+            this.returnType = returnType;
+            this.synchronousCallFailedResponseHandler = synchronousCallFailedResponseHandler;
+            this.maxTryCount = maxTryCount;
+        }
+
+        @Override
+        public Type responseType() {
+            return returnType;
+        }
+
+        @Override
+        public Object adapt(Call<Object> call) {
+            int currentTryCount = 0;
+
+            Call<Object> currentCall = call;
+            while (true) {
+
+                if (currentTryCount > 1) {
+                    log.debug("current call is executed. clone and execute again. currentTryCount : {}", currentTryCount);
+                    currentCall = call.clone();
+                }
+
+                try {
+                    Response<Object> response = currentCall.execute();
+                    if (response.isSuccessful()) {
+                        return response.body();
+                    }
+
+                    int responseStatusCode = response.code();
+                    boolean is5xx = responseStatusCode >= 500 && responseStatusCode < 600;
+                    if (is5xx && currentTryCount < maxTryCount) {
+                        log.info("request is unsuccessfull with status code : " + responseStatusCode + " and  currentTryCount: " + currentTryCount);
+                        continue;
+                    }
+
+                    throw synchronousCallFailedResponseHandler.handleErrorResponse(response);
+                } catch (IOException e) {
+                    log.error("call execution failed. current retry count: {}, message: {}", currentTryCount, e.getMessage(), e);
+                    if (currentTryCount == maxTryCount) {
+                        throw new IllegalStateException("HTTP call execution failed. tryCount: " + currentTryCount + ".", e);
+                    }
+                    continue;
+                }
             }
-            throw new ApiRequestException(responseStatusCode, "UNKNOWN", errorBodyString);
         }
     }
 }

@@ -43,3 +43,4 @@ implementation "com.squareup.retrofit2:converter-jackson:2.9.0"
 * [HwangEunmi/Retrofit-Sample](https://github.com/HwangEunmi/Retrofit-Sample)
 * [동기 응답](https://stackoverflow.com/a/35104080/1051402) : `Call`이나 `CompletableFuture` 등으로 감싸지
  않고 원하는 객체를 바로 반환하게 하는 방법
+* [Easily Retrying Network Requests on Android (with Retrofit 2)](https://medium.com/shuttl/easily-retrying-network-requests-on-android-with-retrofit-2-ee4b4b379eb7)
