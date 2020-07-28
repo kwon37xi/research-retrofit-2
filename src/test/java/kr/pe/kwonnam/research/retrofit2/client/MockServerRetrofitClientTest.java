@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.jupiter.MockServerExtension;
-import org.mockserver.matchers.Times;
 import org.mockserver.model.Delay;
 import org.mockserver.model.MediaType;
 import org.mockserver.verify.VerificationTimes;
@@ -33,6 +32,11 @@ class MockServerRetrofitClientTest {
     MockServerRetrofitClientTest(ClientAndServer mockServer) {
         this.mockServer = mockServer;
         port = mockServer.getLocalPort();
+    }
+
+    @BeforeEach
+    void setUp() {
+        mockServer.reset();
 
         mockServer.when(
             request()
@@ -70,10 +74,7 @@ class MockServerRetrofitClientTest {
                     "</body>\n" +
                     "</html>")
         );
-    }
 
-    @BeforeEach
-    void setUp() {
         mockServerRetrofitClient = new RetrofitClientBuilder()
             .baseUrl("http://localhost:" + port)
             .connectionTimeout(Duration.ofMillis(500))

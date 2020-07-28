@@ -40,11 +40,19 @@ public class SynchronousCallAdapterFactory extends CallAdapter.Factory {
 
         DefaultSynchronousCallFailedResponseHandler synchronousCallFailedResponseHandler = new DefaultSynchronousCallFailedResponseHandler();
 
-        return Arrays.stream(annotations)
+        Retry retryAnnotation = getRetryAnnotation(annotations);
+
+        if (retryAnnotation == null) {
+            return SynchronousCallAdapter.create(returnType, synchronousCallFailedResponseHandler);
+        }
+        return SynchronousCallRetryAdapter.create(returnType, synchronousCallFailedResponseHandler, retryAnnotation);
+    }
+
+    private Retry getRetryAnnotation(Annotation[] annotations) {
+        return (Retry) Arrays.stream(annotations)
             .filter(annotation -> annotation.annotationType() == Retry.class)
             .findFirst()
-            .map(annotation -> SynchronousCallRetryAdapter.create(returnType, synchronousCallFailedResponseHandler, (Retry) annotation))
-            .orElseGet(() -> SynchronousCallAdapter.create(returnType, synchronousCallFailedResponseHandler));
+            .orElse(null);
     }
 
     public static SynchronousCallAdapterFactory create() {
