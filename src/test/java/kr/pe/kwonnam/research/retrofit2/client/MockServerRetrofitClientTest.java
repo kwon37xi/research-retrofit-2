@@ -10,8 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.jupiter.MockServerExtension;
+import org.mockserver.matchers.Times;
 import org.mockserver.model.Delay;
 import org.mockserver.model.MediaType;
+import org.mockserver.verify.VerificationTimes;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -106,5 +108,29 @@ class MockServerRetrofitClientTest {
             .startsWith("<html>")
             .contains("에러가 발생하였습니다.")
             .endsWith("</html>");
+    }
+
+    @Test
+    @DisplayName("@Retry 끝까지 실패 - maxTryCount=5, backOffMillis=50 으로 5회 재시도 후에, 500 응답을 예외로 변경하여 반한한다.")
+    void error500WithRetry(SoftAssertions softly) {
+        var apiEx = catchThrowableOfType(() -> {
+            mockServerRetrofitClient.error500WithRetry();
+        }, ApiRequestException.class);
+
+
+        softly.assertThat(apiEx.getErrorCode()).as("errorCode 는 UNKNOWN이다.")
+            .isEqualTo("UNKNOWN");
+
+        softly.assertThat(apiEx.getMessage()).as("HTML 로 전송된 내용을 저장하고 있어야한다.")
+            .startsWith("<html>")
+            .contains("에러가 발생하였습니다.")
+            .endsWith("</html>");
+
+        mockServer.verify(
+            request()
+                .withMethod("POST")
+                .withPath("/error/500"),
+            VerificationTimes.exactly(5)
+        );
     }
 }

@@ -1,6 +1,7 @@
 package kr.pe.kwonnam.research.retrofit2.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import kr.pe.kwonnam.research.retrofit2.synchronous.Retry;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -15,4 +16,9 @@ public interface MockServerRetrofitClient {
 
     @POST("/error/500")
     JsonNode error500();
+
+    @POST("/error/500")
+    @Retry(maxTryCount = 5, backOffMillis = 50)
+    JsonNode error500WithRetry();
+
 }

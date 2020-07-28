@@ -1,4 +1,4 @@
-package kr.pe.kwonnam.research.retrofit2;
+package kr.pe.kwonnam.research.retrofit2.synchronous;
 
 import retrofit2.Response;
 

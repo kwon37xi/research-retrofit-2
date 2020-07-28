@@ -27,7 +27,11 @@ implementation "com.squareup.retrofit2:converter-jackson:2.9.0"
 * 재시도를 해야 한다.
 
 ## TODO
-    - Retry
+- Retry
+- todo failedResponseHandler 한번만 생성해서 주입하게 처리
+- Retry 여부 결정로직분리.
+- TODO RxJava, Scala, Reactor 등 자유롭게 추가 가능해야 한다.
+
 - [basic auth](https://stackoverflow.com/questions/43366164/retrofit-and-okhttp-basic-authentication)
   - https://futurestud.io/tutorials/android-basic-authentication-with-retrofit
 
