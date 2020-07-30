@@ -1,9 +1,8 @@
-package kr.pe.kwonnam.research.retrofit2;
+package kr.pe.kwonnam.research.retrofit2.synchronous;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.pe.kwonnam.research.retrofit2.client.ApiRequestException;
-import kr.pe.kwonnam.research.retrofit2.synchronous.SynchronousCallFailedResponseHandler;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;

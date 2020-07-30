@@ -1,6 +1,5 @@
 package kr.pe.kwonnam.research.retrofit2.synchronous;
 
-import kr.pe.kwonnam.research.retrofit2.DefaultSynchronousCallFailedResponseHandler;
 import lombok.extern.slf4j.Slf4j;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
