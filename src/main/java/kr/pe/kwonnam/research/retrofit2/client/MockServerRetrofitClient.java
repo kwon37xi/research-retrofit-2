@@ -11,8 +11,16 @@ import retrofit2.http.Query;
  */
 
 public interface MockServerRetrofitClient {
+    @GET("/get-simple")
+    @Retry(maxTryCount = 3, backOffMillis = 10)
+    JsonNode getSimpleWithRetry();
+
     @GET("/error/400")
     JsonNode error400(@Query("message") String message);
+
+    @GET("/error/400")
+    @Retry(maxTryCount = 5, backOffMillis = 10)
+    JsonNode error400WithRetry(@Query("message") String message);
 
     @POST("/error/500")
     JsonNode error500();
@@ -20,5 +28,12 @@ public interface MockServerRetrofitClient {
     @POST("/error/500")
     @Retry(maxTryCount = 5, backOffMillis = 50)
     JsonNode error500WithRetry();
+
+    @POST("/read-timeout")
+    JsonNode readTimeout();
+
+    @POST("/read-timeout")
+    @Retry(maxTryCount = 4, backOffMillis = 7)
+    JsonNode readTimeoutWithRetry();
 
 }

@@ -26,12 +26,12 @@ public class DefaultSynchronousCallFailedResponseHandler implements SynchronousC
         MediaType errorMediaType = errorBody.contentType();
         String errorBodyString = null;
         try {
-             errorBodyString = errorBody.string();
+            errorBodyString = errorBody.string();
 
-            log.debug("failure status code : {}, contentType: {} type : {} , subtype : {}, errorBody : {}",
-                responseStatusCode, errorMediaType, errorMediaType.type(), errorMediaType.subtype(), errorBodyString);
+            log.debug("failure status code : {}, contentType: {}, mediaType: {}, errorBody : {}",
+                responseStatusCode, errorMediaType, errorMediaType, errorBodyString);
 
-            if (errorMediaType.subtype().equals("json")) {
+            if (errorMediaType != null && "json".equals(errorMediaType.subtype())) {
                 JsonNode jsonNode = failedResponseObjectMapper.reader().readTree(errorBodyString);
                 String errorCode = jsonNode.get("errorCode").asText();
                 String errorMessage = jsonNode.get("errorMessage").asText();

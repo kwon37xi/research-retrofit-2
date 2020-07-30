@@ -57,7 +57,10 @@ public class SynchronousCallRetryAdapter implements CallAdapter<Object, Object> 
             } catch (IOException e) {
                 log.error("call execution failed. current retry count: {}, message: {}", currentTryCount, e.getMessage(), e);
                 if (currentTryCount == retry.maxTryCount()) {
-                    throw new IllegalStateException("HTTP call execution failed. tryCount: " + currentTryCount + ".", e);
+                    String exceptionMessage = String.format("retrofit synchronous call failed. - %s, try count : %s.",
+                        e.getMessage(), currentTryCount);
+
+                    throw new IllegalStateException(exceptionMessage, e);
                 }
                 continue;
             }
