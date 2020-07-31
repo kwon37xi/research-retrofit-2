@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="20 seconds">
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%-5level %d{HH:mm:ss.SSS} [%thread] %logger{36} - %msg [%mdc]%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+        <includeCallerData>false</includeCallerData>
+        <queueSize>4096</queueSize>
+        <appender-ref ref="console"/>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="async"/>
+    </root>
+
+</configuration>

@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Year;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * https://httpbin.org/
@@ -65,6 +66,8 @@ public interface HttpBinClient {
     @GET("/delay/{delaySeconds}")
     Call<JsonNode> delay(@Path("delaySeconds") int delaySeconds);
 
+    @GET("/delay/{delaySeconds}")
+    CompletableFuture<JsonNode> completableDelay(@Path("delaySeconds") int delaySeconds);
 
     /**
      * Synchronous(동기식) 요청. 반환 타입을 {@link Call} 없이 기술할 수 있다.

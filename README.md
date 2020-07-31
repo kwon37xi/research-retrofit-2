@@ -4,6 +4,9 @@
 * [Retrofit Github](https://github.com/square/retrofit)
 * [Retrofit 2 Maven Repository](https://mvnrepository.com/artifact/com.squareup.retrofit2)
 
+Retrofit 2 는 OKHTTP 를 사용하는 HTTP 호출을 편리하게 해주는 라이브러리이다.
+
+OKHTTP 는 완전한 비동기 non-blocking IO를 지원하지 않고, 쓰레드 기반 비동기만 지원하는 라이브러리이므로, 순수 non-blocking 은 아님을 확인해야 한다.
 
 ```
 implementation com.squareup.retrofit2:retrofit:2.9.0

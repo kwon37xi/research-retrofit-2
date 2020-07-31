@@ -81,7 +81,7 @@ public class RetrofitClientBuilder {
             .connectTimeout(connectionTimeout)
             .readTimeout(readTimeout)
             .writeTimeout(writeTimeout)
-            .addInterceptor(new HttpLoggingInterceptor(message -> okhttpLogger.debug("OKHTTP : {}", message))
+            .addInterceptor(new HttpLoggingInterceptor(message -> okhttpLogger.debug("[TID {}] {}", Thread.currentThread().getId(), message))
                 .setLevel(HttpLoggingInterceptor.Level.BODY));
 
         if (okHttpClientBuilderCustomizers != null) {

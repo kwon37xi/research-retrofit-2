@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
+import org.assertj.core.data.TemporalUnitOffset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,9 +15,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
 @DisplayName("HttpBinClientTest")
@@ -198,4 +201,43 @@ class HttpBinClientTest {
         softly.assertThat(args.getOrderDateTime()).isEqualTo(LocalDateTime.of(2020, 7, 24, 20, 31, 48, 111));
         softly.assertThat(args.getExpireYear()).isEqualTo(Year.of(2041));
     }
+
+    @Test
+    @DisplayName("3초 delay로 순차 실행하면 9초 이상이 걸린다.")
+    void completableDelaySequentialExecution(SoftAssertions softly) throws ExecutionException, InterruptedException {
+        long startTimeMillis = System.currentTimeMillis();
+        httpBinClient.completableDelay(3).get();
+        httpBinClient.completableDelay(3).get();
+        httpBinClient.completableDelay(3).get();
+        long endTimeMillis = System.currentTimeMillis();
+
+        TemporalUnitOffset within = within(1L, ChronoUnit.SECONDS);
+
+        assertThat(Duration.ofMillis(endTimeMillis - startTimeMillis))
+            .as("9초는 무조건 넘고 대량 12초 정도 이내에 실행될것으로 기대함.")
+            .isBetween(Duration.ofSeconds(9), Duration.ofSeconds(12));
+    }
+
+
+    @Test
+    @DisplayName("3초 delay로 여러건을 동시 실행하면 3초 이상 6초 이하로 걸릴것으로 예상한다.")
+    void completableDelayConcurrentExecution(SoftAssertions softly) throws ExecutionException, InterruptedException {
+        long startTimeMillis = System.currentTimeMillis();
+        CompletableFuture.allOf(
+            httpBinClient.completableDelay(3),
+            httpBinClient.completableDelay(3),
+            httpBinClient.completableDelay(3),
+            httpBinClient.completableDelay(3),
+            httpBinClient.completableDelay(3)
+        ).join();
+
+        long endTimeMillis = System.currentTimeMillis();
+
+        Duration elapsed = Duration.ofMillis(endTimeMillis - startTimeMillis);
+        log.debug("Concurrent call elapsed : {}ms", elapsed.toMillis());
+        assertThat(elapsed)
+            .as("동시실행의 경우는 3초는 무조건 넘고 대량 6초 정도 이내에 실행될것으로 기대함.")
+            .isBetween(Duration.ofSeconds(3), Duration.ofSeconds(6));
+    }
+
 }
